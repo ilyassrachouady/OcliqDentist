@@ -31,7 +31,7 @@ const days = [
 ];
 
 export default function SettingsPage() {
-  const { dentist, setDemo } = useAuth();
+  const { dentist } = useAuth();
   const [formData, setFormData] = useState<Partial<Dentist>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [bookingUrl, setBookingUrl] = useState('');

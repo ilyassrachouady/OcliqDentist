@@ -40,7 +40,7 @@ const navigation = [
 export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, dentist, logout, isDemo, setDemo } = useAuth();
+  const { user, dentist, logout, isDemo } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {

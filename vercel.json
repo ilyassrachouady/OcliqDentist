@@ -19,19 +19,5 @@
         }
       ]
     }
-  ],
-  "env": [
-    {
-      "key": "VITE_API_URL",
-      "description": "API endpoint URL (leave empty for localStorage demo)"
-    },
-    {
-      "key": "VITE_SUPABASE_URL",
-      "description": "Supabase project URL (optional, for future backend)"
-    },
-    {
-      "key": "VITE_SUPABASE_KEY",
-      "description": "Supabase anon key (optional, for future backend)"
-    }
   ]
 }

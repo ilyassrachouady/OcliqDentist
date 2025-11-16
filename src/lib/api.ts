@@ -106,7 +106,7 @@ export const api = {
       appointments: [],
     };
     
-    const patients = await api.getPatients(patient.id); // This will need dentistId
+    const patients = await api.getPatients(dentistId || ""); // This will need dentistId
     patients.push(newPatient);
     storage.setItem(`patients_${patient.id}`, patients);
     

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import { Patient, Appointment } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale/fr';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +26,6 @@ import {
   Phone,
   Mail,
   Calendar,
-  FileText,
   Edit,
   Save,
   X,
@@ -116,11 +114,9 @@ export default function PatientProfilePage() {
     );
   }
 
-  const upcomingAppointments = patient.appointments
     .filter(apt => new Date(apt.date) >= new Date() && apt.status !== 'cancelled')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const pastAppointments = patient.appointments
     .filter(apt => new Date(apt.date) < new Date() || apt.status === 'completed')
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -292,7 +288,6 @@ export default function PatientProfilePage() {
 
             <TabsContent value="appointments" className="mt-6">
               <div className="space-y-6">
-                {upcomingAppointments.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-4">Rendez-vous à venir</h3>
                     <Table>
@@ -305,7 +300,6 @@ export default function PatientProfilePage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {upcomingAppointments.map((apt) => (
                           <TableRow key={apt.id}>
                             <TableCell>
                               {format(new Date(apt.date), 'dd/MM/yyyy', { locale: fr })}
@@ -322,7 +316,6 @@ export default function PatientProfilePage() {
                   </div>
                 )}
 
-                {pastAppointments.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-4">Historique</h3>
                     <Table>
@@ -335,7 +328,6 @@ export default function PatientProfilePage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {pastAppointments.map((apt) => (
                           <TableRow key={apt.id}>
                             <TableCell>
                               {format(new Date(apt.date), 'dd/MM/yyyy', { locale: fr })}

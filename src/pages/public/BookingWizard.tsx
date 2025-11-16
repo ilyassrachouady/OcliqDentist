@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarScheduler } from '@/components/ui/calendar-scheduler';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -296,7 +296,6 @@ export default function BookingWizard() {
     return dateAvailability.get(dateStr);
   };
 
-  const getDateStatus = (date: Date) => {
     const avail = getDateAvailability(date);
     if (!avail) return 'loading';
     if (avail.remaining === 0) return 'full';
@@ -384,7 +383,7 @@ export default function BookingWizard() {
               <CardContent className="space-y-6">
                 {/* Steps */}
                 <div className="space-y-4">
-                  {STEPS.map((step, index) => {
+                  {STEPS.map((step) => {
                     const isCompleted = completedSteps >= step.id;
                     const isCurrent = currentStep === step.id;
                     const Icon = step.icon;
