@@ -99,8 +99,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
       vacationDates: [],
       services: [
-        { id: 's1', name: 'Consultation', description: 'Consultation générale', duration: 30, price: 200 },
-        { id: 's2', name: 'Détartrage', description: 'Nettoyage professionnel', duration: 45, price: 300 },
+        { id: 's1', name: 'Consultation', description: 'Consultation générale', price: 200 },
+        { id: 's2', name: 'Détartrage', description: 'Nettoyage professionnel', price: 300 },
       ],
       bookingPageId: `dentist-${Date.now()}`,
     };

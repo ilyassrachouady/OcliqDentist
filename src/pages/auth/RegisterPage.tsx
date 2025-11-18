@@ -55,82 +55,83 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-600 rounded-2xl mb-4">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Ocliq</h1>
-          <p className="text-gray-600">Gestion dentaire professionnelle</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">DentalFlow</h1>
+          <p className="text-slate-600">Créez votre cabinet dentaire numérique</p>
         </div>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold">Créer un compte</CardTitle>
-            <CardDescription>
-              Inscrivez-vous pour commencer à gérer votre cabinet dentaire
+        <Card className="shadow-xl border-slate-200 bg-white">
+          <CardHeader className="space-y-2 text-center">
+            <CardTitle className="text-2xl font-bold text-slate-900">Créer votre compte</CardTitle>
+            <CardDescription className="text-slate-600">
+              Démarrez votre practice dentaire digitale en quelques minutes
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom complet</Label>
+                <Label htmlFor="name" className="text-sm font-medium text-slate-700">Nom complet</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     id="name"
                     type="text"
                     placeholder="Dr. Ahmed Benali"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white transition-colors"
                     required
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email professionnel</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="votre@email.com"
+                    placeholder="dr.benali@clinique.ma"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white transition-colors"
                     required
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-slate-700">Mot de passe</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white transition-colors"
                     required
                     minLength={6}
                   />
                 </div>
+                <p className="text-xs text-slate-500">Minimum 6 caractères</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">Confirmer le mot de passe</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     id="confirmPassword"
                     type="password"
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white transition-colors"
                     required
                     minLength={6}
                   />
@@ -140,18 +141,23 @@ export default function RegisterPage() {
             <CardFooter className="flex flex-col space-y-4">
               <Button
                 type="submit"
-                className="w-full rounded-xl bg-blue-600 hover:bg-blue-700"
+                className="w-full rounded-xl bg-teal-600 hover:bg-teal-700 h-11 font-medium"
                 disabled={isLoading}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
-                {isLoading ? 'Création...' : 'Créer mon compte'}
+                {isLoading ? 'Création du compte...' : 'Créer mon compte dentiste'}
               </Button>
-              <p className="text-sm text-center text-gray-600">
-                Vous avez déjà un compte?{' '}
-                <Link to="/login" className="text-blue-600 hover:underline font-medium">
-                  Se connecter
-                </Link>
-              </p>
+              <div className="text-center space-y-2">
+                <p className="text-xs text-slate-500">
+                  En créant un compte, vous acceptez nos conditions d'utilisation
+                </p>
+                <p className="text-sm text-slate-600">
+                  Vous avez déjà un compte?{' '}
+                  <Link to="/login" className="text-teal-600 hover:text-teal-700 font-semibold">
+                    Se connecter
+                  </Link>
+                </p>
+              </div>
             </CardFooter>
           </form>
         </Card>

@@ -543,7 +543,7 @@ export default function PatientDemoPage() {
           <Button
             onClick={() => {
               setShowSuccess(false);
-              window.location.reload();
+              navigate(0); // React Router way to refresh the current route
             }}
             className="w-full rounded-xl bg-blue-600 hover:bg-blue-700"
           >

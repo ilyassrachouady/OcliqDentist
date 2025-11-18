@@ -6,10 +6,12 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import BookingPage from './pages/public/BookingPage';
 import BookingWizard from './pages/public/BookingWizard';
+import EnhancedBookingDemo from './pages/public/EnhancedBookingDemo';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardHome from './pages/dashboard/DashboardHome';
 import PatientsPage from './pages/dashboard/PatientsPage';
 import AppointmentsPage from './pages/dashboard/AppointmentsPage';
+import BillingPage from './pages/dashboard/BillingPage';
 import SettingsPage from './pages/dashboard/SettingsPage';
 import PatientProfilePage from './pages/dashboard/PatientProfilePage';
 import './App.css';
@@ -44,7 +46,8 @@ function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/dentist/:id" element={<BookingPage />} />
-      <Route path="/demo" element={<BookingWizard />} />
+      <Route path="/demo" element={<EnhancedBookingDemo />} />
+      <Route path="/demo-old" element={<BookingWizard />} />
       <Route path="/book" element={<BookingWizard />} />
       <Route path="/wizard" element={<BookingWizard />} />
 
@@ -61,6 +64,7 @@ function AppRoutes() {
         <Route path="patients" element={<PatientsPage />} />
         <Route path="patients/:id" element={<PatientProfilePage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
+        <Route path="billing" element={<BillingPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 

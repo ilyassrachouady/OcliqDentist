@@ -29,6 +29,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Clock, MapPin, Phone, Mail, CheckCircle2, Star, Share2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BookingLoadingState } from '@/components/ui/loading';
+import { AppleBookingFlow } from '@/components/booking';
 
 export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
@@ -110,11 +112,7 @@ export default function BookingPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-muted-foreground">Chargement...</div>
-      </div>
-    );
+    return <BookingLoadingState />;
   }
 
   if (!dentist) {
@@ -144,7 +142,7 @@ export default function BookingPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 py-8 px-4">
+    <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* PREMIUM DENTIST HERO CARD */}
         <div className="relative mb-8 overflow-hidden rounded-3xl shadow-2xl border-0">
@@ -265,10 +263,18 @@ export default function BookingPage() {
           </div>
         </div>
 
-        {/* MAIN BOOKING + REVIEWS SECTION */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT: Booking Form */}
-          <div className="lg:col-span-2 space-y-6">
+        {/* MAIN BOOKING SECTION - Apple Style */}
+        <AppleBookingFlow 
+          onComplete={(booking) => {
+            toast.success('Rendez-vous confirmé avec succès!');
+            // Handle successful booking - could show success modal, redirect, etc.
+          }}
+        />
+
+        {/* REVIEWS SECTION */}
+        <div className="mt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2"></div>
             {/* Service Selection Card */}
             <Card className="shadow-lg border-0">
               <CardHeader>

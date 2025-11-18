@@ -25,12 +25,12 @@ export const demoDentist: Dentist = {
   },
   vacationDates: [],
   services: [
-    { id: 's1', name: 'Consultation', description: 'Consultation générale', duration: 30, price: 200 },
-    { id: 's2', name: 'Détartrage', description: 'Nettoyage professionnel', duration: 45, price: 300 },
-    { id: 's3', name: 'Blanchiment', description: 'Blanchiment des dents', duration: 60, price: 1500 },
-    { id: 's4', name: 'Implant dentaire', description: 'Pose d\'implant', duration: 120, price: 5000 },
-    { id: 's5', name: 'Orthodontie', description: 'Consultation orthodontique', duration: 45, price: 400 },
-    { id: 's6', name: 'Soin carie', description: 'Traitement de carie', duration: 45, price: 500 },
+    { id: 's1', name: 'Consultation', description: 'Consultation générale', price: 200 },
+    { id: 's2', name: 'Détartrage', description: 'Nettoyage professionnel', price: 300 },
+    { id: 's3', name: 'Blanchiment', description: 'Blanchiment des dents', price: 1500 },
+    { id: 's4', name: 'Implant dentaire', description: 'Pose d\'implant', price: 5000 },
+    { id: 's5', name: 'Orthodontie', description: 'Consultation orthodontique', price: 400 },
+    { id: 's6', name: 'Soin carie', description: 'Traitement de carie', price: 500 },
   ],
   bookingPageId: 'demo-dentist-1',
   reviews: [

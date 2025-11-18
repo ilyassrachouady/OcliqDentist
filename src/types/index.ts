@@ -43,8 +43,7 @@ export interface Service {
   id: string;
   name: string;
   description?: string;
-  duration: number; // in minutes
-  price: number;
+  price: number; // in MAD (Moroccan Dirham)
 }
 
 export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';

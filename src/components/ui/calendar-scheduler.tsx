@@ -1,122 +1,276 @@
 "use client";
 
 import * as React from "react";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
+import { format, addDays, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isBefore } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
 export interface CalendarSchedulerProps {
   timeSlots?: string[];
   onConfirm?: (value: { date?: Date; time?: string }) => void;
   onDateChange?: (date: Date | undefined) => void;
   disabledDates?: (date: Date) => boolean;
+  showButtons?: boolean;
+  onTimeSelect?: (time: string) => void;
 }
+
+// Helper to generate consistent random availability for a date
+const getDateAvailability = (date: Date): boolean => {
+  const dateStr = date.toISOString().split('T')[0];
+  const hash = dateStr.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return hash % 5 !== 0; // ~80% available, ~20% fully booked
+};
+
+// Helper to generate consistent random availability for a time slot
+const getTimeSlotAvailability = (date: Date, time: string): boolean => {
+  const dateStr = date.toISOString().split('T')[0];
+  // First check if the entire day is unavailable
+  if (!getDateAvailability(date)) {
+    return false; // Entire day is unavailable
+  }
+  const combined = `${dateStr}-${time}`;
+  const hash = combined.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return hash % 2 === 0;
+};
+
+// Helper to check if any time slot is available on a given date
+const hasAvailableSlots = (date: Date, slots: string[]): boolean => {
+  return slots.some(slot => getTimeSlotAvailability(date, slot));
+};
 
 function CalendarScheduler({
   timeSlots = [
-    "08:00 AM",
-    "09:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "01:00 PM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM",
-    "05:00 PM",
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
   ],
   onConfirm,
   onDateChange,
   disabledDates,
+  showButtons = true,
+  onTimeSelect,
 }: CalendarSchedulerProps) {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [time, setTime] = React.useState<string | undefined>();
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
+  const [selectedTime, setSelectedTime] = React.useState<string | undefined>();
+  const [showTimeModal, setShowTimeModal] = React.useState(false);
+  const [modalDate, setModalDate] = React.useState<Date | undefined>();
+  // Use default slots if none provided
+  const slotsToUse = timeSlots && timeSlots.length > 0 ? timeSlots : [
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+  ];
 
-  const handleDateSelect = (newDate: Date | undefined) => {
-    setDate(newDate);
-    setTime(undefined); // Reset time when date changes
-    onDateChange?.(newDate);
+  const handleDateSelect = (date: Date) => {
+    if (disabledDates?.(date)) return;
+    // Only allow selecting if day has available slots
+    if (!hasAvailableSlots(date, slotsToUse)) return;
+    setModalDate(date);
+    setShowTimeModal(true);
+    setSelectedDate(date);
+    setSelectedTime(undefined);
+    onDateChange?.(date);
   };
 
+  const handlePrevMonth = () => {
+    setCurrentMonth(prev => addDays(prev, -32));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => addDays(prev, 32));
+  };
+
+  // Generate calendar days
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  
+  // Pad with previous and next month days for complete grid
+  const firstDayOfWeek = getDay(monthStart);
+  const prevMonthDays = Array(firstDayOfWeek).fill(null).map((_, i) => addDays(monthStart, -(firstDayOfWeek - i)));
+  const allDays = [...prevMonthDays, ...calendarDays];
+  
+  // Add remaining days to complete the last week
+  const remainingDays = 42 - allDays.length;
+  const nextMonthDays = Array(remainingDays).fill(null).map((_, i) => addDays(monthEnd, i + 1));
+  const gridDays = [...allDays, ...nextMonthDays];
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
-    <div className="w-full">
-      <Card className="w-full max-w-4xl shadow-lg border border-gray-200 bg-white">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold text-gray-900">Choisissez une date et une heure</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col lg:flex-row gap-6 p-6">
-          {/* Calendar Section */}
-          <div className="flex-1 border-2 border-gray-100 rounded-xl bg-gray-50/50 overflow-hidden">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDateSelect}
-              disabled={disabledDates}
-              locale={fr}
-            />
+    <div className="w-full space-y-6">
+      {/* Calendar */}
+      <Card className="shadow-lg border-gray-200">
+        <CardContent className="p-6">
+          {/* Month Navigation */}
+          <div className="flex items-center justify-between mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrevMonth}
+              className="h-10 w-10 p-0"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <h2 className="text-lg font-semibold">
+              {format(currentMonth, "MMMM yyyy", { locale: fr })}
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleNextMonth}
+              className="h-10 w-10 p-0"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
           </div>
 
-          {/* Time Slots Section */}
-          <div className="flex-1 border-2 border-gray-100 rounded-xl p-6 bg-gray-50/50 overflow-y-auto max-h-[500px]">
-            <p className="mb-4 text-base font-semibold text-gray-900">
-              Choisissez un créneau
-            </p>
-            {timeSlots.length === 0 ? (
-              <div className="text-center py-12 text-sm text-gray-500">
-                Sélectionnez d'abord une date pour voir les créneaux disponibles
+          {/* Day of Week Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-2">
+            {["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map(day => (
+              <div key={day} className="text-center text-sm font-semibold text-gray-500 h-10 flex items-center justify-center">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2">
+            {gridDays.map((day, index) => {
+              const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+              const isSelected = selectedDate && isSameDay(day, selectedDate);
+              const isPastDate = isBefore(day, today);
+              const isExternallyDisabled = disabledDates?.(day);
+              const dayHasAvailableSlots = isCurrentMonth && !isPastDate && !isExternallyDisabled && hasAvailableSlots(day, slotsToUse);
+              const isToday = isSameDay(day, today);
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleDateSelect(day)}
+                  disabled={!dayHasAvailableSlots || isExternallyDisabled || isPastDate}
+                  className={cn(
+                    "h-10 rounded-lg font-medium text-sm transition-all",
+                    isCurrentMonth ? "text-gray-900" : "text-gray-300",
+                    isSelected && "bg-blue-600 text-white shadow-md ring-2 ring-blue-500 ring-offset-2",
+                    !isSelected && dayHasAvailableSlots && "bg-green-100 text-green-900 border-2 border-green-300 hover:bg-green-200 cursor-pointer",
+                    !isSelected && !dayHasAvailableSlots && isCurrentMonth && !isPastDate && !isExternallyDisabled && "bg-red-100 text-red-900 border-2 border-red-300 cursor-not-allowed opacity-60",
+                    (isPastDate || isExternallyDisabled) && !isSelected && "opacity-50 cursor-not-allowed bg-gray-100",
+                    isToday && !isSelected && "ring-2 ring-blue-300",
+                  )}
+                >
+                  {format(day, "d")}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Time Slot Modal */}
+      <Dialog open={showTimeModal} onOpenChange={setShowTimeModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="w-5 h-5 text-blue-600" />
+                Créneaux disponibles
+              </div>
+              <div className="text-sm font-normal text-gray-600 mt-1">
+                {modalDate && format(modalDate, "EEEE d MMMM yyyy", { locale: fr })}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-4">
+            {slotsToUse.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p>Aucun créneau disponible</p>
+                <p className="text-sm">pour cette date</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {timeSlots.map((slot) => (
-                  <Button
-                    key={slot}
-                    variant={time === slot ? "default" : "outline"}
-                    size="default"
-                    className={cn(
-                      "w-full h-12 text-base font-medium transition-all duration-200",
-                      time === slot 
-                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md ring-2 ring-blue-500 ring-offset-2" 
-                        : "border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 text-gray-700 hover:text-blue-700"
-                    )}
-                    onClick={() => setTime(slot)}
-                  >
-                    {slot}
-                  </Button>
-                ))}
+              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto">
+                {slotsToUse.map((slot) => {
+                  const isAvailable = modalDate ? getTimeSlotAvailability(modalDate, slot) : false;
+                  const isSelected = selectedTime === slot;
+
+                  return (
+                    <Button
+                      key={slot}
+                      onClick={() => {
+                        if (isAvailable && modalDate) {
+                          setSelectedTime(slot);
+                          setSelectedDate(modalDate);
+                          onTimeSelect?.(slot);
+                          setShowTimeModal(false); // Close modal after selection
+                        }
+                      }}
+                      disabled={!isAvailable}
+                      variant={isSelected ? "default" : "outline"}
+                      className={cn(
+                        "h-14 transition-all font-semibold text-sm",
+                        isSelected && "bg-blue-600 hover:bg-blue-700 text-white shadow-md ring-2 ring-blue-300",
+                        !isSelected && isAvailable && "bg-green-50 text-green-800 border-2 border-green-300 hover:bg-green-100 hover:border-green-400",
+                        !isSelected && !isAvailable && "bg-red-50 text-red-700 border-2 border-red-200 cursor-not-allowed opacity-60",
+                      )}
+                    >
+                      <div className="text-center">
+                        <div className="font-bold">{slot}</div>
+                        {!isAvailable && <div className="text-xs">Complet</div>}
+                        {isAvailable && !isSelected && <div className="text-xs text-green-600">Disponible</div>}
+                        {isSelected && <div className="text-xs text-blue-200">Sélectionné</div>}
+                      </div>
+                    </Button>
+                  );
+                })}
               </div>
             )}
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-between px-6 pb-6 pt-0">
+        </DialogContent>
+      </Dialog>
+
+      {/* Actions */}
+      {showButtons && (
+        <div className="flex gap-3 justify-end">
           <Button
-            variant="ghost"
-            size="default"
-            className="px-6 h-10 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            variant="outline"
             onClick={() => {
-              setDate(undefined);
-              setTime(undefined);
+              setSelectedDate(undefined);
+              setSelectedTime(undefined);
+              setCurrentMonth(new Date());
             }}
+            className="px-6 h-12"
           >
             Réinitialiser
           </Button>
           <Button
-            size="default"
-            className="px-8 h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md"
-            onClick={() => onConfirm?.({ date, time })}
-            disabled={!date || !time}
+            onClick={() => onConfirm?.({ date: selectedDate, time: selectedTime })}
+            disabled={!selectedDate || !selectedTime}
+            className="px-8 h-12 bg-blue-600 hover:bg-blue-700"
           >
             Confirmer
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }
